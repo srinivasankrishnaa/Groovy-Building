@@ -71,4 +71,3 @@ class Gexcel {
 /*def poochi =new Gexcel()
 poochi.loadexcelfile("/home/krishnan/Desktop/readex1.xlsx","Sheet1")
 poochi.exceltocsv("/home/krishnan/Desktop/Bhanuexcel.csv")*/
-
