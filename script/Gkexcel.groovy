@@ -65,7 +65,6 @@ class Gexcel {
         println "File Generated Successfully in ... "+wrexcel.wfile.path
     }
 
-
 }
 //Usage
 /*def poochi =new Gexcel()

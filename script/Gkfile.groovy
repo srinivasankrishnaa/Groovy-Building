@@ -36,19 +36,21 @@ class Gfileprocess {
 
     def writefile(String filename){wfile=new File(filename)}
 
-    def distinctpattern(List <String> pttrn)
+    def distinctpattern(List <String> pttrn,String containingstring)
     {
+        //distinctpattern([["string1","string2"]],"containingstring of the line")
         def str=[]
         def op=[]
         rfile.eachLine {src->
-
-            pttrn.each {pat->
-                str=src.split(pat[0])
-                str=str[1].split(pat[1])
-                op<<str[0]
-            }
-            dstptrnop<<op
-            op=[]
+    if(src.contains(containingstring)) {
+    pttrn.each { pat ->
+        str = src.split(pat[0])
+        str = str[1].split(pat[1])
+        op << str[0]
+    }
+        dstptrnop << op
+        op = []
+    }
         }
         dstptrnop.countBy {it}.each {println it}
     }
