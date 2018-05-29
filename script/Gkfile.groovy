@@ -9,6 +9,8 @@ class Gfileprocess {
     int filelines=0
     int ccount =0
     Map fix=[:]
+    def csvarr=[]
+    int pos=0
 
 //ex://def ptrn=[["StructureEvent Type = "," : notificationId"],["X.733::EventType = "," | neTime "]]
 
@@ -32,7 +34,7 @@ class Gfileprocess {
         word.each {wrd->
             rfile.eachLine {
                 ccount = ccount + it.count(wrd).toInteger()
-            } println "The File Contains $wrd " + ccount.toInteger() + " Times...";ccount=0; }}
+            } println "The File Contains $wrd " + ccount.toInteger() + " Times...";ccount=0 }}
 
     def writefile(String filename){wfile=new File(filename)}
 
@@ -204,9 +206,48 @@ class Gfileprocess {
         //usage=>getdistinctkeys(["=",":"],"-----------ME START----------------","---------------------------")
     }
 
+def csvwriter(String colfilepath,String strtline,String endline,boolean endlinestatus)
+{
+
+    File colfile=new File(colfilepath)
+
+    colfile.eachLine { txt ->
+        txt=txt.replace("^","").replace(":","")
+        csvarr << '"' + txt + '"'
+    }
+    wfile.append(csvarr.join(",") + "\n")
+    csvarr = []
+
+    rfile.eachLine { str ->
+        //println str
+        //str = str.replace("}", "").replace('"', "")
+
+        if (str.startsWith(strtline)) {
+            wfile.append(csvarr.join(",") + "\n")
+            println csvarr.join(",")
+            csvarr = []
+        }
+
+        colfile.eachLine { String dat ->
+
+            if (str.startsWith(dat)) {
+                csvarr[pos] = '"' + str.replace(dat, "") + '"'
+            }
+            pos = pos + 1
+
+        }
+        pos = 0
+
+    }
+
+
+
+
 
 
 }
+
+}//End Of Class
 
 //def poochi=new Gfileprocess()
 //def poochi2=new Gfileprocess()
