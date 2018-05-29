@@ -5,77 +5,79 @@ class Gfileprocess {
     String wfilepath
     File rfile
     File wfile
-    def dstptrnop=[]
-    int filelines=0
-    int ccount =0
-    Map fix=[:]
-    def csvarr=[]
-    int pos=0
+    def dstptrnop = []
+    int filelines = 0
+    int ccount = 0
+    Map fix = [:]
+    def csvarr = []
+    int pos = 0
+    boolean writetoarray=false
 
 //ex://def ptrn=[["StructureEvent Type = "," : notificationId"],["X.733::EventType = "," | neTime "]]
 
-    def loadfile(String filename){rfile=new File(filename)}
+    def loadfile(String filename) { rfile = new File(filename) }
 
-    def readfile(){rfile.eachLine {println it}}
+    def readfile() { rfile.eachLine { println it } }
 
-    def countlines(){
-        println "Reading The File "+rfile.path.toString()+"..."
-        rfile.eachWithIndex { val, num -> filelines=num }
-        println "The File Contains "+filelines.toString()+" Lines..." ;return filelines.toString()}
+    def countlines() {
+        println "Reading The File " + rfile.path.toString() + "..."
+        rfile.eachWithIndex { val, num -> filelines = num }
+        println "The File Contains " + filelines.toString() + " Lines..."; return filelines.toString()
+    }
 
-    def countword(String word){
-        println "Reading The File "+rfile.path.toString()+"..."
+    def countword(String word) {
+        println "Reading The File " + rfile.path.toString() + "..."
         rfile.eachLine {
-        ccount = ccount + it.count(word).toInteger()
-    } println "The File Contains $word " + ccount.toInteger() + " Times...";return ccount.toInteger();ccount=0;}
+            ccount = ccount + it.count(word).toInteger()
+        } println "The File Contains $word " + ccount.toInteger() + " Times..."; return ccount.toInteger(); ccount = 0;
+    }
 
     def countword(List<String> word) {//["string1","string2","string-N"]
-        println "Reading The File "+rfile.path.toString()+"..."
-        word.each {wrd->
+        println "Reading The File " + rfile.path.toString() + "..."
+        word.each { wrd ->
             rfile.eachLine {
                 ccount = ccount + it.count(wrd).toInteger()
-            } println "The File Contains $wrd " + ccount.toInteger() + " Times...";ccount=0 }}
-
-    def writefile(String filename){wfile=new File(filename)}
-
-    def distinctpattern(List <String> pttrn,String containingstring)
-    {
-        //distinctpattern([["string1","string2"]],"containingstring of the line")
-        def str=[]
-        def op=[]
-        rfile.eachLine {src->
-    if(src.contains(containingstring)) {
-    pttrn.each { pat ->
-        str = src.split(pat[0])
-        str = str[1].split(pat[1])
-        op << str[0]
-    }
-        dstptrnop << op
-        op = []
-    }
+            } println "The File Contains $wrd " + ccount.toInteger() + " Times..."; ccount = 0
         }
-        dstptrnop.countBy {it}.each {println it}
     }
 
-    def getlinescontaining(String str,Boolean val)
-    {
+    def writefile(String filename) { wfile = new File(filename) }
+
+    def distinctpattern(List<String> pttrn, String containingstring) {
+        //distinctpattern([["string1","string2"]],"containingstring of the line")
+        def str = []
+        def op = []
+        rfile.eachLine { src ->
+            if (src.contains(containingstring)) {
+                pttrn.each { pat ->
+                    str = src.split(pat[0])
+                    str = str[1].split(pat[1])
+                    op << str[0]
+                }
+                dstptrnop << op
+                op = []
+            }
+        }
+        dstptrnop.countBy { it }.each { println it }
+    }
+
+    def getlinescontaining(String str, Boolean val) {
         rfile.each {
             if (it.contains(str)) {
-                wfile.append(it+"\n")
+                wfile.append(it + "\n")
             }
         }
     }
 
-    def mappattern(Map mp,String strtline,String endline,List<String> splitdltr,String savedltr)
-    {
+    def mappattern(Map mp, String strtline, String endline, List<String> splitdltr, String savedltr) {
         //Map fix=["HDD Device 0":"","HDD Model ID":"", "HDD Serial No":"", "HDD Revision":"", "HDD Size":"", "Interface":"", "Temperature":"", "Health":"", "Performance":"", "Power on Time":"", "Est. Lifetime":""]
-        fix=mp
-        int ct=0
-        def val=[]
-        def key,value
-        boolean st=false
+        fix = mp
+        int ct = 0
+        def val = []
+        def key, value
+        boolean st = false
 
-        fix.keySet().each{wfile.append(it.toString()+savedltr)}
+        fix.keySet().each { wfile.append(it.toString() + savedltr) }
         wfile.append("\n")
 
         rfile.eachLine { fld ->
@@ -147,52 +149,54 @@ class Gfileprocess {
                         }
                     }
                 }
-            }
-                else {
-                        //println "Entry..."
-                        if (st == true) {
-                            splitdltr.each { sdtr ->
+            } else {
+                //println "Entry..."
+                if (st == true) {
+                    splitdltr.each { sdtr ->
 
-                                if (fld.contains(sdtr)) {
-                                    //println sdtr +"====="+it
-                                    val = (fld + " ").split(sdtr)
-                                    //println val
-                                    key = val[0].trim()//+sdtr
-                                    value = val[1].trim()
-                                    //if(value==null){value=" "}
-                                    //println value
-                                    fix[key] = '"' + value + '"'
-                                }
-                            }
+                        if (fld.contains(sdtr)) {
+                            //println sdtr +"====="+it
+                            val = (fld + " ").split(sdtr)
+                            //println val
+                            key = val[0].trim()//+sdtr
+                            value = val[1].trim()
+                            //if(value==null){value=" "}
+                            //println value
+                            fix[key] = '"' + value + '"'
                         }
                     }
                 }
-
-                println "File Located At : " + wfile.path.toString()
-//usage=>mappattern(["HDD Device 0":"","HDD Model ID":"", "HDD Serial No":"", "HDD Revision":"", "HDD Size":"", "Interface":"", "Temperature":"", "Health":"", "Performance":"", "Power on Time":"", "Est. Lifetime":""],"------completed------",":","^")
             }
+        }
 
-    def getdistinctkeys(List<String> dltr,String flstrt,String flend)
-    {
-        def tt=[]
-        def yy=[]
-        boolean st=false
+        println "File Located At : " + wfile.path.toString()
+//usage=>mappattern(["HDD Device 0":"","HDD Model ID":"", "HDD Serial No":"", "HDD Revision":"", "HDD Size":"", "Interface":"", "Temperature":"", "Health":"", "Performance":"", "Power on Time":"", "Est. Lifetime":""],"------completed------",":","^")
+    }
+
+    def getdistinctkeys(List<String> dltr, String flstrt, String flend) {
+        def tt = []
+        def yy = []
+        boolean st = false
         //def dltr=[":","="]
 
-        rfile.eachLine {fl->
+        rfile.eachLine { fl ->
 
-            if(flend==""){
-                if(fl.contains(flstrt)){st=true}
+            if (flend == "") {
+                if (fl.contains(flstrt)) {
+                    st = true
+                }
+            } else {
+                if (fl.startsWith(flend)) {
+                    st = false
+                }//Ending
+                if (fl.contains(flstrt)) {
+                    st = true
+                }//Starting
             }
-            else
-            {
-                if (fl.startsWith(flend)){st=false}//Ending
-                if (fl.contains(flstrt)){st=true}//Starting
-            }
 
 
-            if(st==true){       //Get The Distinct Key
-                dltr.each {dtr->
+            if (st == true) {       //Get The Distinct Key
+                dltr.each { dtr ->
                     if (fl.contains(dtr)) {
                         ///println fl
                         yy = fl.tokenize(dtr)
@@ -202,15 +206,49 @@ class Gfileprocess {
                 }
             }
         }
-        return tt.countBy {it}.each {it}.keySet()
+        return tt.countBy { it }.each { it }.keySet()
         //usage=>getdistinctkeys(["=",":"],"-----------ME START----------------","---------------------------")
     }
 
-def csvwriter(String colfilepath,String strtline,String endline,boolean endlinestatus)
+    def csvwriter(String strtline,String endline,boolean useendline)
+    {
+        rfile.eachLine {str->
+
+            if(str.startsWith(strtline))
+            {
+                if(useendline==false)
+                {
+                    wfile.append(csvarr.join(",") + "\n")
+                    csvarr = []
+                    pos=0
+                }
+                writetoarray=true
+            }
+
+            if(useendline==true)
+            {
+                if (str.startsWith(endline)) {
+                    wfile.append(csvarr.join(",") + "\n")
+                    csvarr = []
+                    pos=0
+                    writetoarray = false
+                }
+            }
+
+            if(writetoarray==true)
+            {
+                csvarr[pos] = str
+                pos = pos + 1
+            }
+
+        }
+        //Usage=>poochi.csvwriter("Date^Mon May 21","node-type^",true)
+    }
+
+def csvwriterwithcolnames(String colfilepath,String strtline,String endline,boolean useendline)
 {
-
     File colfile=new File(colfilepath)
-
+    //Writing Col Names
     colfile.eachLine { txt ->
         txt=txt.replace("^","").replace(":","")
         csvarr << '"' + txt + '"'
@@ -221,30 +259,42 @@ def csvwriter(String colfilepath,String strtline,String endline,boolean endlines
     rfile.eachLine { str ->
         //println str
         //str = str.replace("}", "").replace('"', "")
-
-        if (str.startsWith(strtline)) {
-            wfile.append(csvarr.join(",") + "\n")
-            println csvarr.join(",")
-            csvarr = []
-        }
-
-        colfile.eachLine { String dat ->
-
-            if (str.startsWith(dat)) {
-                csvarr[pos] = '"' + str.replace(dat, "") + '"'
+        if(str.startsWith(strtline))
+        {
+            if(useendline==false)
+            {
+                wfile.append(csvarr.join(",") + "\n")
+                csvarr = []
+                pos=0
             }
-            pos = pos + 1
-
+            writetoarray=true
         }
-        pos = 0
+
+        if(useendline==true)
+        {
+            if (str.startsWith(endline)) {
+                wfile.append(csvarr.join(",") + "\n")
+                csvarr = []
+                pos=0
+                writetoarray = false
+            }
+        }
+
+        if(writetoarray==true) {
+
+            colfile.eachLine { String dat ->
+
+                if (str.startsWith(dat)) {
+                    csvarr[pos] = '"' + str.replace(dat, "") + '"'
+                }
+                pos = pos + 1
+
+            }
+            pos = 0
+        }
 
     }
-
-
-
-
-
-
+//Usage=>poochi.csvwriterwithcolnames("/home/krishnan/Desktop/col-OutCardFail.txt","Date^Mon May 21","=======================================",true)
 }
 
 }//End Of Class
