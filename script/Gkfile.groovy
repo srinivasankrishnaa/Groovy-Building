@@ -30,7 +30,7 @@ class Gfileprocess {
         println "Reading The File " + rfile.path.toString() + "..."
         rfile.eachLine {
             ccount = ccount + it.count(word).toInteger()
-        } println "The File Contains $word " + ccount.toInteger() + " Times..."; return ccount.toInteger(); ccount = 0;
+        } println "The File Contains $word " + ccount.toInteger() + " Times..."; return '"'+word+'" Is Found '+ccount.toInteger()+" Times..."; ccount = 0;
     }
 
     def countword(List<String> word) {//["string1","string2","string-N"]
@@ -271,7 +271,7 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
     rfile.eachLine { str ->
         //println str
         //str = str.replace("}", "").replace('"', "")
-        if (str.startsWith(strtline)) {
+        if (str.contains(strtline)) {
             if (useendline == false) {
                 wfile.append(csvarr.join(",") + "\n")
                 csvarr = []
@@ -317,6 +317,8 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
             }
             wfile.append(dat+"\n")                          //Write To File
         }
+        //Usage filereplace("File Name")
+
     }//End Of filereplace
 
 

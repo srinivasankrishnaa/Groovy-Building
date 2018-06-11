@@ -12,8 +12,8 @@ class Gexcel {
     def cell
     def row
     def column
-    int rowcount
-    int colcount
+    public int rowcount
+    public int colcount
 
     def excel2003(FileInputStream excelfile) {
         HSSFWorkbook wb = new HSSFWorkbook(excelfile)
@@ -32,8 +32,17 @@ class Gexcel {
     }
 
     def loadexcelfile(String filename, String sheetname) {
+//        println filename
         FileInputStream file = new FileInputStream(new File(filename))
-        excel2007(file)
+        if(filename.endsWith(".xlsx")) {
+        //    println '2007'
+            excel2007(file)
+        }
+        else if (filename.endsWith(".xls")) {
+        //    println '2003'
+            excel2003(file)
+        }
+
         getrowcolcount(sheetname)
     }
 
@@ -44,7 +53,8 @@ class Gexcel {
     }
 
     def gcell(int row, int col) {
-        return workbook.getSheet(sheet).getRow(row).getCell(col)
+        if(workbook.getSheet(sheet).getRow(row).getCell(col)==null) {return "".toString()}
+        else {return workbook.getSheet(sheet).getRow(row).getCell(col).toString()}
     }
 
     def exceltocsv(String csvfilename)
