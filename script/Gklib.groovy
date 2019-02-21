@@ -120,7 +120,7 @@ class Gdatabase {
                 sql.execute(dbqry)
                 println "Table $tablename Created Successfully..."
             } else {
-                println "Table Poochi Already Exists..."
+                println "Table $tablename Already Exists..."
             }//Table Exist...
         }
 

@@ -13,6 +13,7 @@ class Gfileprocess {
     int pos = 0
     boolean writetoarray=false
     File colfile
+    public String txtdltr=","
 
 //ex://def ptrn=[["StructureEvent Type = "," : notificationId"],["X.733::EventType = "," | neTime "]]
 
@@ -203,7 +204,6 @@ class Gfileprocess {
                 }//Starting
             }
 
-
             if (st == true) {       //Get The Distinct Key
                 dltr.each { dtr ->
                     if (fl.contains(dtr)) {
@@ -227,7 +227,7 @@ class Gfileprocess {
             {
                 if(useendline==false)
                 {
-                    wfile.append(csvarr.join(",") + "\n")
+                    wfile.append(csvarr.join(txtdltr) + "\n")
                     csvarr = []
                     pos=0
                 }
@@ -237,7 +237,7 @@ class Gfileprocess {
             if(useendline==true)
             {
                 if (str.startsWith(endline)) {
-                    wfile.append(csvarr.join(",") + "\n")
+                    wfile.append(csvarr.join(txtdltr) + "\n")
                     csvarr = []
                     pos=0
                     writetoarray = false
@@ -251,7 +251,7 @@ class Gfileprocess {
             }
 
         }
-        wfile.append(csvarr.join(",") + "\n")   //Flush The Remaining Lat Entry
+        wfile.append(csvarr.join(txtdltr) + "\n")   //Flush The Remaining Lat Entry
         //Usage=>poochi.csvwriter("Date^Mon May 21","node-type^",true)
     }
 
@@ -262,7 +262,7 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
         txt = txt.replace("^", "").replace(":", "")
         csvarr << '"' + txt + '"'
     }
-    wfile.append(csvarr.join(",") + "\n")
+    wfile.append(csvarr.join(txtdltr) + "\n")
     //println csvarr.join(",")//===========================
     println "Column Names Written..."
     sleep(1000)
@@ -273,7 +273,7 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
         //str = str.replace("}", "").replace('"', "")
         if (str.contains(strtline)) {
             if (useendline == false) {
-                wfile.append(csvarr.join(",") + "\n")
+                wfile.append(csvarr.join(txtdltr) + "\n")
                 csvarr = []
                 pos = 0
             }
@@ -282,7 +282,7 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
 
         if (useendline == true) {
             if (str.startsWith(endline)) {
-                wfile.append(csvarr.join(",") + "\n")
+                wfile.append(csvarr.join(txtdltr) + "\n")
                 //println csvarr.join(",")//===========================
                 csvarr = []
                 pos = 0
@@ -296,6 +296,7 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
 
                 if (str.startsWith(dat)) {
                     csvarr[pos] = '"' + str.replace(dat, "") + '"'
+
                 }
                 pos = pos + 1
 
@@ -304,9 +305,75 @@ def csvwriterwithcolnames(String colfilepath,String strtline,String endline,bool
         }
 
     }
-    wfile.append(csvarr.join(",") + "\n")   //Flush The Remaining Lat Entry
+    wfile.append(csvarr.join(txtdltr) + "\n")   //Flush The Remaining Lat Entry
 //Usage=>poochi.csvwriterwithcolnames("/home/krishnan/Desktop/col-OutCardFail.txt","Date^Mon May 21","=======================================",true)
 }
+
+    def csvwriterwithcolnamesspl(String colfilepath,String strtline,String endline,boolean useendline) {
+        //Writing Col Names
+        boolean proc=false
+        colfile = new File(colfilepath)
+        colfile.eachLine { txt ->
+            txt = txt.replace("^", "").replace(":", "")
+            csvarr << '"' + txt + '"'
+        }
+        wfile.append(csvarr.join(txtdltr) + "\n")
+        //println csvarr.join(",")//===========================
+        println "Column Names Written..."
+        sleep(1000)
+        csvarr = []
+
+        rfile.eachLine { str ->
+            proc=false
+            //println str
+            //str = str.replace("}", "").replace('"', "")
+            if (str.contains(strtline)) {
+                if (useendline == false) {
+                    wfile.append(csvarr.join(txtdltr) + "\n")
+                    csvarr = []
+                    pos = 0
+                }
+                writetoarray = true
+            }
+
+            if (useendline == true) {
+                if (str.startsWith(endline)) {
+                    wfile.append(csvarr.join(txtdltr) + "\n")
+                    //println csvarr.join(",")//===========================
+                    csvarr = []
+                    pos = 0
+                    writetoarray = false
+                }
+            }
+
+            if (writetoarray == true) {
+
+                colfile.eachLine { String dat ->
+
+                    if (proc == false) {
+                        if (str.contains(dat)) {
+                            csvarr << str.replace(dat, "")
+                            proc = true
+                        }
+                    }
+
+                }
+                //pos = 0
+                /*if(proc==false)
+                {
+                    println "Yes Found..."
+                    csvarr<<""
+                }*/
+            }
+
+
+        }
+        wfile.append(csvarr.join(txtdltr) + "\n")   //Flush The Remaining Lat Entry
+//Usage=>poochi.csvwriterwithcolnames("/home/krishnan/Desktop/col-OutCardFail.txt","Date^Mon May 21","=======================================",true)
+    }
+
+
+
     def filereplace(String colfilepath)
     {
         colfile = new File(colfilepath)                     //File Containing The Replace Values

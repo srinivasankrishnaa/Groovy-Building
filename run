@@ -1,3 +1,0 @@
-#!/bin/sh
-#java -cp .:../lib/* groovy.ui.GroovyMain "$@"
-java -cp .:$("pwd")/lib/* groovy.ui.GroovyMain "$@"
